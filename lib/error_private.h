@@ -32,8 +32,8 @@
 ****************************************************************** */
 /* Note : this module is expected to remain private, do not expose it */
 
-#ifndef ERROR_H_MODULE
-#define ERROR_H_MODULE
+#ifndef ERROR_H_MODULE_FSE
+#define ERROR_H_MODULE_FSE
 
 #if defined (__cplusplus)
 extern "C" {
@@ -64,8 +64,8 @@ extern "C" {
 /*-****************************************
 *  Customization (error_public.h)
 ******************************************/
-typedef FSE_ErrorCode ERR_enum;
-#define PREFIX(name) FSE_error_##name
+typedef FSE_original_ErrorCode ERR_enum;
+#define PREFIX(name) FSE_original_error_##name
 
 
 /*-****************************************
@@ -112,4 +112,4 @@ ERR_STATIC const char* ERR_getErrorName(size_t code)
 }
 #endif
 
-#endif /* ERROR_H_MODULE */
+#endif /* ERROR_H_MODULE_FSE */

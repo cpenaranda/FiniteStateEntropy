@@ -32,8 +32,8 @@
     - FSE source repository : https://github.com/Cyan4973/FiniteStateEntropy
     - Public forum : https://groups.google.com/forum/#!forum/lz4c
 ****************************************************************** */
-#ifndef MEM_H_MODULE
-#define MEM_H_MODULE
+#ifndef MEM_H_MODULE_FSE
+#define MEM_H_MODULE_FSE
 
 #if defined (__cplusplus)
 extern "C" {
@@ -370,5 +370,5 @@ MEM_STATIC U32 MEM_readMINMATCH(const void* memPtr, U32 length)
 }
 #endif
 
-#endif /* MEM_H_MODULE */
+#endif /* MEM_H_MODULE_FSE */
 

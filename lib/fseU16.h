@@ -42,10 +42,10 @@ extern "C" {
 /*-*****************************************
 *  Tuning parameters
 *******************************************/
-/* FSE_MAX_SYMBOL_VALUE :
+/* FSE_original_MAX_SYMBOL_VALUE :
 *  Maximum nb of symbol values authorized.
 *  Required for allocation purposes */
-#define FSE_MAX_SYMBOL_VALUE 286   /* This is just an example, typical value for zlib */
+#define FSE_original_MAX_SYMBOL_VALUE 286   /* This is just an example, typical value for zlib */
 
 
 /*-*****************************************
@@ -58,19 +58,19 @@ extern "C" {
 *  FSE U16 functions
 *******************************************/
 
-/*!FSE_compressU16() :
+/*!FSE_original_compressU16() :
    data is presented or regenerated as a table of unsigned short (2 bytes per symbol),
    which is useful for alphabet size > 256.
    Important ! All symbol values within input table must be <= 'maxSymbolValue'.
-   Maximum allowed 'maxSymbolValue' is controlled by constant FSE_MAX_SYMBOL_VALUE
+   Maximum allowed 'maxSymbolValue' is controlled by constant FSE_original_MAX_SYMBOL_VALUE
    Special values : if result == 0, data is not compressible => Nothing is stored within cSrc !!
                     if result == 1, data is one constant element x srcSize times. Use RLE compression.
-                    if FSE_isError(result), it's an error code.*/
-size_t FSE_compressU16(void* dst, size_t maxDstSize,
+                    if FSE_original_isError(result), it's an error code.*/
+size_t FSE_original_compressU16(void* dst, size_t maxDstSize,
        const unsigned short* src, size_t srcSize,
        unsigned maxSymbolValue, unsigned tableLog);
 
-size_t FSE_decompressU16(unsigned short* dst, size_t maxDstSize, const void* cSrc, size_t cSrcSize);
+size_t FSE_original_decompressU16(unsigned short* dst, size_t maxDstSize, const void* cSrc, size_t cSrcSize);
 
 
 

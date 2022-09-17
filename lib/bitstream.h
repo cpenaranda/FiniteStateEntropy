@@ -32,8 +32,8 @@
    You can contact the author at :
    - Source repository : https://github.com/Cyan4973/FiniteStateEntropy
 ****************************************************************** */
-#ifndef BITSTREAM_H_MODULE
-#define BITSTREAM_H_MODULE
+#ifndef BITSTREAM_H_MODULE_FSE
+#define BITSTREAM_H_MODULE_FSE
 
 #if defined (__cplusplus)
 extern "C" {
@@ -411,4 +411,4 @@ MEM_STATIC unsigned BIT_endOfDStream(const BIT_DStream_t* DStream)
 }
 #endif
 
-#endif /* BITSTREAM_H_MODULE */
+#endif /* BITSTREAM_H_MODULE_FSE */

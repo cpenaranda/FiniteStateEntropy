@@ -37,35 +37,35 @@
 ***************************************/
 #include "mem.h"
 #include "error_private.h"       /* ERR_*, ERROR */
-#define FSE_STATIC_LINKING_ONLY  /* FSE_MIN_TABLELOG */
-#include "fse.h"   /* FSE_isError, FSE_getErrorName */
-#define HUF_STATIC_LINKING_ONLY  /* HUF_TABLELOG_ABSOLUTEMAX */
-#include "huf.h"   /* HUF_isError, HUF_getErrorName */
+#define FSE_original_STATIC_LINKING_ONLY  /* FSE_original_MIN_TABLELOG */
+#include "fse.h"   /* FSE_original_isError, FSE_original_getErrorName */
+#define HUF_original_STATIC_LINKING_ONLY  /* HUF_original_TABLELOG_ABSOLUTEMAX */
+#include "huf.h"   /* HUF_original_isError, HUF_original_getErrorName */
 
 
 
 /*-****************************************
 *  FSE Error Management
 ******************************************/
-unsigned FSE_isError(size_t code) { return ERR_isError(code); }
+unsigned FSE_original_isError(size_t code) { return ERR_isError(code); }
 
-const char* FSE_getErrorName(size_t code) { return ERR_getErrorName(code); }
+const char* FSE_original_getErrorName(size_t code) { return ERR_getErrorName(code); }
 
 
 /* **************************************************************
 *  HUF Error Management
 ****************************************************************/
-unsigned HUF_isError(size_t code) { return ERR_isError(code); }
+unsigned HUF_original_isError(size_t code) { return ERR_isError(code); }
 
-const char* HUF_getErrorName(size_t code) { return ERR_getErrorName(code); }
+const char* HUF_original_getErrorName(size_t code) { return ERR_getErrorName(code); }
 
 
 /*-**************************************************************
 *  FSE NCount encoding-decoding
 ****************************************************************/
-static short FSE_abs(short a) { return a<0 ? -a : a; }
+static short FSE_original_abs(short a) { return a<0 ? -a : a; }
 
-size_t FSE_readNCount (short* normalizedCounter, unsigned* maxSVPtr, unsigned* tableLogPtr,
+size_t FSE_original_readNCount (short* normalizedCounter, unsigned* maxSVPtr, unsigned* tableLogPtr,
                  const void* headerBuffer, size_t hbSize)
 {
     const BYTE* const istart = (const BYTE*) headerBuffer;
@@ -81,8 +81,8 @@ size_t FSE_readNCount (short* normalizedCounter, unsigned* maxSVPtr, unsigned* t
 
     if (hbSize < 4) return ERROR(srcSize_wrong);
     bitStream = MEM_readLE32(ip);
-    nbBits = (bitStream & 0xF) + FSE_MIN_TABLELOG;   /* extract tableLog */
-    if (nbBits > FSE_TABLELOG_ABSOLUTE_MAX) return ERROR(tableLog_tooLarge);
+    nbBits = (bitStream & 0xF) + FSE_original_MIN_TABLELOG;   /* extract tableLog */
+    if (nbBits > FSE_original_TABLELOG_ABSOLUTE_MAX) return ERROR(tableLog_tooLarge);
     bitStream >>= 4;
     bitCount = 4;
     *tableLogPtr = nbBits;
@@ -132,7 +132,7 @@ size_t FSE_readNCount (short* normalizedCounter, unsigned* maxSVPtr, unsigned* t
             }
 
             count--;   /* extra accuracy */
-            remaining -= FSE_abs(count);
+            remaining -= FSE_original_abs(count);
             normalizedCounter[charnum++] = count;
             previous0 = !count;
             while (remaining < threshold) {
@@ -158,13 +158,13 @@ size_t FSE_readNCount (short* normalizedCounter, unsigned* maxSVPtr, unsigned* t
 }
 
 
-/*! HUF_readStats() :
-    Read compact Huffman tree, saved by HUF_writeCTable().
+/*! HUF_original_readStats() :
+    Read compact Huffman tree, saved by HUF_original_writeCTable().
     `huffWeight` is destination buffer.
     @return : size read from `src` , or an error Code .
-    Note : Needed by HUF_readCTable() and HUF_readDTableXn() .
+    Note : Needed by HUF_original_readCTable() and HUF_original_readDTableXn() .
 */
-size_t HUF_readStats(BYTE* huffWeight, size_t hwSize, U32* rankStats,
+size_t HUF_original_readStats(BYTE* huffWeight, size_t hwSize, U32* rankStats,
                      U32* nbSymbolsPtr, U32* tableLogPtr,
                      const void* src, size_t srcSize)
 {
@@ -195,22 +195,22 @@ size_t HUF_readStats(BYTE* huffWeight, size_t hwSize, U32* rankStats,
     }   }   }   }
     else  {   /* header compressed with FSE (normal case) */
         if (iSize+1 > srcSize) return ERROR(srcSize_wrong);
-        oSize = FSE_decompress(huffWeight, hwSize-1, ip+1, iSize);   /* max (hwSize-1) values decoded, as last one is implied */
-        if (FSE_isError(oSize)) return oSize;
+        oSize = FSE_original_decompress(huffWeight, hwSize-1, ip+1, iSize);   /* max (hwSize-1) values decoded, as last one is implied */
+        if (FSE_original_isError(oSize)) return oSize;
     }
 
     /* collect weight stats */
-    memset(rankStats, 0, (HUF_TABLELOG_ABSOLUTEMAX + 1) * sizeof(U32));
+    memset(rankStats, 0, (HUF_original_TABLELOG_ABSOLUTEMAX + 1) * sizeof(U32));
     weightTotal = 0;
     {   U32 n; for (n=0; n<oSize; n++) {
-            if (huffWeight[n] >= HUF_TABLELOG_ABSOLUTEMAX) return ERROR(corruption_detected);
+            if (huffWeight[n] >= HUF_original_TABLELOG_ABSOLUTEMAX) return ERROR(corruption_detected);
             rankStats[huffWeight[n]]++;
             weightTotal += (1 << huffWeight[n]) >> 1;
     }   }
 
     /* get last non-null symbol weight (implied, total must be 2^n) */
     {   U32 const tableLog = BIT_highbit32(weightTotal) + 1;
-        if (tableLog > HUF_TABLELOG_ABSOLUTEMAX) return ERROR(corruption_detected);
+        if (tableLog > HUF_original_TABLELOG_ABSOLUTEMAX) return ERROR(corruption_detected);
         *tableLogPtr = tableLog;
         /* determine last weight */
         {   U32 const total = 1 << tableLog;

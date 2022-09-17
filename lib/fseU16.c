@@ -40,8 +40,8 @@
 *  Increasing memory usage improves compression ratio
 *  Reduced memory usage can improve speed, due to cache effect
 *  Recommended max value is 14, for 16KB, which nicely fits into Intel x86 L1 cache */
-#define FSE_MAX_MEMORY_USAGE 15
-#define FSE_DEFAULT_MEMORY_USAGE 14
+#define FSE_original_MAX_MEMORY_USAGE 15
+#define FSE_original_DEFAULT_MEMORY_USAGE 14
 
 
 /* **************************************************************
@@ -49,8 +49,8 @@
 *****************************************************************/
 #include "fseU16.h"
 #define FSEU16_SYMBOLVALUE_ABSOLUTEMAX 4095
-#if (FSE_MAX_SYMBOL_VALUE > FSEU16_SYMBOLVALUE_ABSOLUTEMAX)
-#  error "FSE_MAX_SYMBOL_VALUE is too large !"
+#if (FSE_original_MAX_SYMBOL_VALUE > FSEU16_SYMBOLVALUE_ABSOLUTEMAX)
+#  error "FSE_original_MAX_SYMBOL_VALUE is too large !"
 #endif
 
 /* **************************************************************
@@ -76,37 +76,37 @@ typedef struct {
     unsigned short newState;
     unsigned nbBits : 4;
     unsigned symbol : 12;
-} FSE_decode_tU16;    /* Note : the size of this struct must be 4 */
+} FSE_original_decode_tU16;    /* Note : the size of this struct must be 4 */
 
 
 /* *******************************************************************
 *  Include type-specific functions from fse.c (C template emulation)
 *********************************************************************/
-#define FSE_COMMONDEFS_ONLY
+#define FSE_original_COMMONDEFS_ONLY
 
-#define FSE_FUNCTION_TYPE U16
-#define FSE_FUNCTION_EXTENSION U16
+#define FSE_original_FUNCTION_TYPE U16
+#define FSE_original_FUNCTION_EXTENSION U16
 
-#define FSE_count_generic FSE_count_genericU16
-#define FSE_buildCTable   FSE_buildCTableU16
+#define FSE_original_count_generic FSE_original_count_genericU16
+#define FSE_original_buildCTable   FSE_original_buildCTableU16
 
-#define FSE_DECODE_TYPE   FSE_decode_tU16
-#define FSE_createDTable  FSE_createDTableU16
-#define FSE_freeDTable    FSE_freeDTableU16
-#define FSE_buildDTable   FSE_buildDTableU16
+#define FSE_original_DECODE_TYPE   FSE_original_decode_tU16
+#define FSE_original_createDTable  FSE_original_createDTableU16
+#define FSE_original_freeDTable    FSE_original_freeDTableU16
+#define FSE_original_buildDTable   FSE_original_buildDTableU16
 
-#include "fse_compress.c"   /* FSE_countU16, FSE_buildCTableU16 */
-#include "fse_decompress.c"   /* FSE_buildDTableU16 */
+#include "fse_compress.c"   /* FSE_original_countU16, FSE_original_buildCTableU16 */
+#include "fse_decompress.c"   /* FSE_original_buildDTableU16 */
 
 
-/*! FSE_countU16() :
+/*! FSE_original_countU16() :
     This function just counts U16 values within `src`,
     and store the histogram into `count`.
     This function is unsafe : it doesn't check that all values within `src` can fit into `count`.
     For this reason, prefer using a table `count` with 256 elements.
     @return : highest count for a single element
 */
-size_t FSE_countU16(unsigned* count, unsigned* maxSymbolValuePtr,
+size_t FSE_original_countU16(unsigned* count, unsigned* maxSymbolValuePtr,
                     const U16* src, size_t srcSize)
 {
     const U16* ip16 = (const U16*)src;
@@ -134,9 +134,9 @@ size_t FSE_countU16(unsigned* count, unsigned* maxSymbolValuePtr,
 /* *******************************************************
 *  U16 Compression functions
 *********************************************************/
-size_t FSE_compressU16_usingCTable (void* dst, size_t maxDstSize,
+size_t FSE_original_compressU16_usingCTable (void* dst, size_t maxDstSize,
                               const U16*  src, size_t srcSize,
-                              const FSE_CTable* ct)
+                              const FSE_original_CTable* ct)
 {
     const U16* const istart = src;
     const U16* const iend = istart + srcSize;
@@ -144,50 +144,50 @@ size_t FSE_compressU16_usingCTable (void* dst, size_t maxDstSize,
 
     BYTE* op = (BYTE*) dst;
     BIT_CStream_t bitC;
-    FSE_CState_t CState;
+    FSE_original_CState_t CState;
 
 
     /* init */
     BIT_initCStream(&bitC, op, maxDstSize);
-    FSE_initCState(&CState, ct);
+    FSE_original_initCState(&CState, ct);
 
     ip=iend;
 
     /* join to even */
     if (srcSize & 1) {
-        FSE_encodeSymbol(&bitC, &CState, *--ip);
+        FSE_original_encodeSymbol(&bitC, &CState, *--ip);
         BIT_flushBits(&bitC);
     }
 
     /* join to mod 4 */
     if (srcSize & 2) {
-        FSE_encodeSymbol(&bitC, &CState, *--ip);
-        FSE_encodeSymbol(&bitC, &CState, *--ip);
+        FSE_original_encodeSymbol(&bitC, &CState, *--ip);
+        FSE_original_encodeSymbol(&bitC, &CState, *--ip);
         BIT_flushBits(&bitC);
     }
 
     /* 2 or 4 encoding per loop */
     while (ip>istart) {
-        FSE_encodeSymbol(&bitC, &CState, *--ip);
+        FSE_original_encodeSymbol(&bitC, &CState, *--ip);
 
-        if (sizeof(size_t)*8 < FSE_MAX_TABLELOG*2+7 )   /* This test must be static */
+        if (sizeof(size_t)*8 < FSE_original_MAX_TABLELOG*2+7 )   /* This test must be static */
             BIT_flushBits(&bitC);
 
-        FSE_encodeSymbol(&bitC, &CState, *--ip);
+        FSE_original_encodeSymbol(&bitC, &CState, *--ip);
 
-        if (sizeof(size_t)*8 > FSE_MAX_TABLELOG*4+7 ) {  /* This test must be static */
-            FSE_encodeSymbol(&bitC, &CState, *--ip);
-            FSE_encodeSymbol(&bitC, &CState, *--ip);
+        if (sizeof(size_t)*8 > FSE_original_MAX_TABLELOG*4+7 ) {  /* This test must be static */
+            FSE_original_encodeSymbol(&bitC, &CState, *--ip);
+            FSE_original_encodeSymbol(&bitC, &CState, *--ip);
         }
         BIT_flushBits(&bitC);
     }
 
-    FSE_flushCState(&bitC, &CState);
+    FSE_original_flushCState(&bitC, &CState);
     return BIT_closeCStream(&bitC);
 }
 
 
-size_t FSE_compressU16(void* dst, size_t maxDstSize,
+size_t FSE_original_compressU16(void* dst, size_t maxDstSize,
        const unsigned short* src, size_t srcSize,
        unsigned maxSymbolValue, unsigned tableLog)
 {
@@ -198,39 +198,39 @@ size_t FSE_compressU16(void* dst, size_t maxDstSize,
     BYTE* const omax = ostart + maxDstSize;
     BYTE* op = ostart;
 
-    U32   counting[FSE_MAX_SYMBOL_VALUE+1] = {0};
-    S16   norm[FSE_MAX_SYMBOL_VALUE+1];
+    U32   counting[FSE_original_MAX_SYMBOL_VALUE+1] = {0};
+    S16   norm[FSE_original_MAX_SYMBOL_VALUE+1];
     CTable_max_t ct;
 
 
 
     /* checks */
     if (srcSize <= 1) return srcSize;
-    if (!maxSymbolValue) maxSymbolValue = FSE_MAX_SYMBOL_VALUE;
-    if (!tableLog) tableLog = FSE_DEFAULT_TABLELOG;
-    if (maxSymbolValue > FSE_MAX_SYMBOL_VALUE) return ERROR(maxSymbolValue_tooLarge);
-    if (tableLog > FSE_MAX_TABLELOG) return ERROR(tableLog_tooLarge);
+    if (!maxSymbolValue) maxSymbolValue = FSE_original_MAX_SYMBOL_VALUE;
+    if (!tableLog) tableLog = FSE_original_DEFAULT_TABLELOG;
+    if (maxSymbolValue > FSE_original_MAX_SYMBOL_VALUE) return ERROR(maxSymbolValue_tooLarge);
+    if (tableLog > FSE_original_MAX_TABLELOG) return ERROR(tableLog_tooLarge);
 
     /* Scan for stats */
-    {   size_t const maxCount = FSE_countU16 (counting, &maxSymbolValue, ip, srcSize);
-        if (FSE_isError(maxCount)) return maxCount;
+    {   size_t const maxCount = FSE_original_countU16 (counting, &maxSymbolValue, ip, srcSize);
+        if (FSE_original_isError(maxCount)) return maxCount;
         if (maxCount == srcSize) return 1;   /* Input data is one constant element x srcSize times. Use RLE compression. */
     }
     /* Normalize */
-    tableLog = FSE_optimalTableLog(tableLog, srcSize, maxSymbolValue);
-    {   size_t const errorCode = FSE_normalizeCount (norm, tableLog, counting, srcSize, maxSymbolValue);
-        if (FSE_isError(errorCode)) return errorCode;
+    tableLog = FSE_original_optimalTableLog(tableLog, srcSize, maxSymbolValue);
+    {   size_t const errorCode = FSE_original_normalizeCount (norm, tableLog, counting, srcSize, maxSymbolValue);
+        if (FSE_original_isError(errorCode)) return errorCode;
     }
     /* Write table description header */
-    {   size_t const NSize = FSE_writeNCount (op, omax-op, norm, maxSymbolValue, tableLog);
-        if (FSE_isError(NSize)) return NSize;
+    {   size_t const NSize = FSE_original_writeNCount (op, omax-op, norm, maxSymbolValue, tableLog);
+        if (FSE_original_isError(NSize)) return NSize;
         op += NSize;
     }
     /* Compress */
-    {   size_t const errorCode = FSE_buildCTableU16 (ct, norm, maxSymbolValue, tableLog);
-        if (FSE_isError(errorCode)) return errorCode;
+    {   size_t const errorCode = FSE_original_buildCTableU16 (ct, norm, maxSymbolValue, tableLog);
+        if (FSE_original_isError(errorCode)) return errorCode;
     }
-    op += FSE_compressU16_usingCTable (op, omax - op, ip, srcSize, ct);
+    op += FSE_original_compressU16_usingCTable (op, omax - op, ip, srcSize, ct);
 
     /* check compressibility */
     if ( (size_t)(op-ostart) >= (size_t)(srcSize-1)*(sizeof(U16)) )
@@ -244,9 +244,9 @@ size_t FSE_compressU16(void* dst, size_t maxDstSize,
 *  U16 Decompression functions
 *********************************************************/
 
-U16 FSE_decodeSymbolU16(FSE_DState_t* DStatePtr, BIT_DStream_t* bitD)
+U16 FSE_original_decodeSymbolU16(FSE_original_DState_t* DStatePtr, BIT_DStream_t* bitD)
 {
-    const FSE_decode_tU16 DInfo = ((const FSE_decode_tU16*)(DStatePtr->table))[DStatePtr->state];
+    const FSE_original_decode_tU16 DInfo = ((const FSE_original_decode_tU16*)(DStatePtr->table))[DStatePtr->state];
     U16 symbol;
     size_t lowBits;
     const U32 nbBits = DInfo.nbBits;
@@ -259,23 +259,23 @@ U16 FSE_decodeSymbolU16(FSE_DState_t* DStatePtr, BIT_DStream_t* bitD)
 }
 
 
-size_t FSE_decompressU16_usingDTable (U16* dst, size_t maxDstSize,
+size_t FSE_original_decompressU16_usingDTable (U16* dst, size_t maxDstSize,
                                const void* cSrc, size_t cSrcSize,
-                               const FSE_DTable* dt)
+                               const FSE_original_DTable* dt)
 {
     U16* const ostart = dst;
     U16* op = ostart;
     U16* const oend = ostart + maxDstSize;
     BIT_DStream_t bitD;
-    FSE_DState_t state;
+    FSE_original_DState_t state;
 
     /* Init */
     memset(&bitD, 0, sizeof(bitD));
     BIT_initDStream(&bitD, cSrc, cSrcSize);
-    FSE_initDState(&state, &bitD, dt);
+    FSE_original_initDState(&state, &bitD, dt);
 
     while((BIT_reloadDStream(&bitD) < 2) && (op<oend)) {
-        *op++ = FSE_decodeSymbolU16(&state, &bitD);
+        *op++ = FSE_original_decodeSymbolU16(&state, &bitD);
     }
 
     if (!BIT_endOfDStream(&bitD)) return ERROR(GENERIC);
@@ -284,27 +284,27 @@ size_t FSE_decompressU16_usingDTable (U16* dst, size_t maxDstSize,
 }
 
 
-size_t FSE_decompressU16(U16* dst, size_t maxDstSize,
+size_t FSE_original_decompressU16(U16* dst, size_t maxDstSize,
                   const void* cSrc, size_t cSrcSize)
 {
     const BYTE* const istart = (const BYTE*) cSrc;
     const BYTE* ip = istart;
-    short NCount[FSE_MAX_SYMBOL_VALUE+1];
+    short NCount[FSE_original_MAX_SYMBOL_VALUE+1];
     DTable_max_t dt;
-    unsigned maxSymbolValue = FSE_MAX_SYMBOL_VALUE;
+    unsigned maxSymbolValue = FSE_original_MAX_SYMBOL_VALUE;
     unsigned tableLog;
 
     /* Sanity check */
     if (cSrcSize<2) return ERROR(srcSize_wrong);   /* specific corner cases (uncompressed & rle) */
 
     /* normal FSE decoding mode */
-    {   size_t const NSize = FSE_readNCount (NCount, &maxSymbolValue, &tableLog, istart, cSrcSize);
-        if (FSE_isError(NSize)) return NSize;
+    {   size_t const NSize = FSE_original_readNCount (NCount, &maxSymbolValue, &tableLog, istart, cSrcSize);
+        if (FSE_original_isError(NSize)) return NSize;
         ip += NSize;
         cSrcSize -= NSize;
     }
-    {   size_t const errorCode = FSE_buildDTableU16 (dt, NCount, maxSymbolValue, tableLog);
-        if (FSE_isError(errorCode)) return errorCode;
+    {   size_t const errorCode = FSE_original_buildDTableU16 (dt, NCount, maxSymbolValue, tableLog);
+        if (FSE_original_isError(errorCode)) return errorCode;
     }
-    return FSE_decompressU16_usingDTable (dst, maxDstSize, ip, cSrcSize, dt);
+    return FSE_original_decompressU16_usingDTable (dst, maxDstSize, ip, cSrcSize, dt);
 }

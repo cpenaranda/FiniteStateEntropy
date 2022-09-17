@@ -31,8 +31,8 @@
    - Source repository : https://github.com/Cyan4973/FiniteStateEntropy
    - Public forum : https://groups.google.com/forum/#!forum/lz4c
 ****************************************************************** */
-#ifndef ERROR_PUBLIC_H_MODULE
-#define ERROR_PUBLIC_H_MODULE
+#ifndef ERROR_PUBLIC_H_MODULE_FSE
+#define ERROR_PUBLIC_H_MODULE_FSE
 
 #if defined (__cplusplus)
 extern "C" {
@@ -43,22 +43,22 @@ extern "C" {
 *  error codes list
 ******************************************/
 typedef enum {
-  FSE_error_no_error,
-  FSE_error_GENERIC,
-  FSE_error_dstSize_tooSmall,
-  FSE_error_srcSize_wrong,
-  FSE_error_corruption_detected,
-  FSE_error_tableLog_tooLarge,
-  FSE_error_maxSymbolValue_tooLarge,
-  FSE_error_maxSymbolValue_tooSmall,
-  FSE_error_maxCode
-} FSE_ErrorCode;
+  FSE_original_error_no_error,
+  FSE_original_error_GENERIC,
+  FSE_original_error_dstSize_tooSmall,
+  FSE_original_error_srcSize_wrong,
+  FSE_original_error_corruption_detected,
+  FSE_original_error_tableLog_tooLarge,
+  FSE_original_error_maxSymbolValue_tooLarge,
+  FSE_original_error_maxSymbolValue_tooSmall,
+  FSE_original_error_maxCode
+} FSE_original_ErrorCode;
 
-/* note : compare with size_t function results using FSE_getError() */
+/* note : compare with size_t function results using FSE_original_getError() */
         
 
 #if defined (__cplusplus)
 }
 #endif
 
-#endif /* ERROR_PUBLIC_H_MODULE */
+#endif /* ERROR_PUBLIC_H_MODULE_FSE */
